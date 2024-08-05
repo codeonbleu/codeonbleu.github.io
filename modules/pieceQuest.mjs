@@ -90,8 +90,7 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 		
 		position(title1, centerX, (1 - phi) * centerY)
 		position(title2, centerX, (1 - phi) * centerY)
-		//title2.visible = false
-		position(tmTitle, title1.x + title1.width / 2 + 60 * scale, title1.y - title1.height * 0.3)
+		position(tmTitle, title1.x + title1.width / 2 + 80 * scale, title1.y - title1.height * 0.4)
 		position(slogan1, centerX, (1 + phi) * centerY, 0.5)
 		position(slogan2, centerX, (1 + phi) * centerY, 0.5)
 		position(piece, centerX, centerY)
@@ -179,7 +178,7 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 	let sloganAccel = 0
 	let pieceTime = 0
 	
-	onClick(title1, () => {
+	onClick(title2, () => {
 		dynamicColor1.update(1)
 		titleAccel = 8
 	})
@@ -204,9 +203,8 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 		const dt = time.deltaTime
 		
 		dynamicColor1.update(dt / 100 * (1 + titleAccel))
-		dynamicColor2.update(dt / 100 * (1 + piece.Accel))
 		dynamicColor3.update(dt / 100 * (1 + sloganAccel))
-		dynamicColor4.update(dt / 100)
+		dynamicColor4.update(dt / 100* (1 + pieceAccel))
 		titleAccel *= 0.99 - 0.001 * dt
 		sloganAccel *= 0.99 - 0.001 * dt
 		
@@ -235,7 +233,7 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 		}
 		
 		pieceTime += 0.02 * dt * pieceRotationDirection * (1 + pieceAccel)
-		piece.scale = ((Math.cos(pieceTime) + 1) / 4 + 0.5) * scale * 0.8
+		piece.scale = ((Math.cos(pieceTime) + 1) / 4 + 0.5) * scale * 0.8 * (scale * 550 / (scale * slogan1.y - scale * title1.y))
 		pieceAccel *= 0.99 - 0.01 * dt
 		
 		title1.tint = dynamicColor1.get()
