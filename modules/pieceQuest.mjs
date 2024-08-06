@@ -52,6 +52,8 @@ Page.launch(class extends Page {
 		this.position(this.cheese, 90 * scale, 100 * scale, 0.15)
 		this.position(this.duelist2, 250 * scale, 90 * scale, 0.15)
 		
+		//this.scholar.y = 100
+		
 		this.awakeningContainer.scale.set(0.75)
 		
 		this.mage.x = -this.textures.awakening.width / 2 - 10
