@@ -19,38 +19,47 @@ export function assignIf(object, values) {
 	return object
 }
 
-function makeDynamicColorComponent(args) {
-	args = assignIf(args, {
-		velocity: 0,
-		theta: 0
-	})
-	
-	const result = {
-		velocity: args.velocity,
-		theta: args.theta
+class DynamicColorComponent {
+	constructor(args) {
+		args = args || {}
+		this.velocity = args.velocity || 0
+		this.theta = args.theta || 0
 	}
 	
-	result.update = (deltaTime) => result.theta = (result.theta + result.velocity * deltaTime) % tau
-	result.get = (offset) => (Math.sin(result.theta + (offset || 0)) + 1) / 2
+	update(deltaTime) {
+		return this.theta = (this.theta + this.velocity * deltaTime) % tau
+	}
 	
-	return result
+	get(offset) {
+		return (Math.sin(this.theta + (offset || 0)) + 1) / 2
+	}
+	
+	getInt(offset) {
+		return Math.floor(this.get(offset) * 0xFF)
+	}
 }
 
-export function makeDynamicColor(args) {
-	args = args ? args : {}
+export class DynamicColor {
+	constructor(args) {
+		args = args || {}
+		
+		this.r = new DynamicColorComponent(args.r)
+		this.g = new DynamicColorComponent(args.g)
+		this.b = new DynamicColorComponent(args.b)
+		
+		if (args.elapse) {
+			this.update(args.elapse)
+		}
+	}
 	
-	const r = makeDynamicColorComponent(args.r)
-	const g = makeDynamicColorComponent(args.g)
-	const b = makeDynamicColorComponent(args.b)
+	update(deltaTime) {
+		this.r.update(deltaTime)
+		this.g.update(deltaTime)
+		this.b.update(deltaTime)
+	}
 	
-	return {
-		update: (deltaTime) => {
-			r.update(deltaTime)
-			g.update(deltaTime)
-			b.update(deltaTime)
-		},
-		get: (offset) =>(Math.floor(r.get(offset) * 0xFF) << 16) | (Math.floor(g.get(offset) * 0xFF) << 8) | Math.floor(b.get(offset) * 0xFF),
-		getInverse: (offset) =>(Math.floor((1 - r.get(offset)) * 0xFF) << 16) | (Math.floor((1 - g.get(offset)) * 0xFF) << 8) | Math.floor((1 - b.get(offset)) * 0xFF)
+	getInt(offset) {
+		return (this.r.getInt(offset) << 16) | (this.g.getInt(offset) << 8) | this.b.getInt(offset)
 	}
 }
 
