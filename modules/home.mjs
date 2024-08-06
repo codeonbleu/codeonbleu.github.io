@@ -1,4 +1,4 @@
-import {Application, Assets, Graphics, Sprite, SCALE_MODES, Texture} from './pixi.min.mjs'
+import {Application, Assets, Container, Graphics, Sprite, SCALE_MODES, Texture} from './pixi.min.mjs'
 import {AdvancedBloomFilter, BevelFilter, GlowFilter, AsciiFilter, DropShadowFilter} from './pixi-filters.mjs'
 import {tau, phi, makeDynamicColor, checkMobile, openInNewTab} from './util.mjs'
 import {makeJuliaFilter} from './shaders/julia.mjs'
@@ -25,13 +25,12 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 	
 	textures.white = Texture.WHITE
 	
-	const isMobile = checkMobile()
-	
-	const newSprite = (textureKey, alpha) => {
+	const newSprite = (textureKey, container, alpha) => {
+		container = container || app.stage
 		const result = new Sprite(textures[textureKey])
 		result.anchor.set(0.5)
 		result.alpha = alpha == null ? 1 : alpha
-		app.stage.addChild(result)
+		container.addChild(result)
 		return result
 	}
 	
@@ -49,14 +48,16 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
     const title2 = newSprite('title')
 	const slogan1 = newSprite('slogan')
 	const slogan2 = newSprite('slogan')
-	const tmSlogan = newSprite('TM', 0.125)
-	const cheese = newSprite('cheese')
-	const func = newSprite('f')
+	const tmSlogan = newSprite('TM', null, 0.125)
+	const gameContainer = new Container()
+	app.stage.addChild(gameContainer)
+	const cheese = newSprite('cheese', gameContainer)
+	const piece = newSprite('piece', gameContainer)
+	const pieceQuest = newSprite('pieceQuest', gameContainer)
+	const func = newSprite('f', gameContainer)
 	const facebook = newSprite('facebook')
 	const linkedin = newSprite('linkedin')
 	const youtube = newSprite('youtube')
-	const piece = newSprite('piece')
-	const pieceQuest = newSprite('pieceQuest')
 	
 	pieceQuest.visible = false
 	piece.visible = false
@@ -100,10 +101,8 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 		position(slogan1, centerX, (1 + phi) * centerY)
 		position(slogan2, centerX, (1 + phi) * centerY)
 		position(tmSlogan, slogan1.x + slogan1.width / 2 + 60 * scale, slogan1.y - slogan1.height * 0.3)
-		position(cheese, centerX, centerY)
-		position(func, centerX - 140 * scale, centerY + 30 * scale)
-		position(pieceQuest, centerX, centerY)
-		position(piece, centerX, centerY)
+		position(gameContainer, centerX, centerY)
+		func.position.set(-140, 30)
 		
 		const logoScale = 0.75
 		const logoX = 220 * scale * logoScale
@@ -195,13 +194,18 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 		cheeseAccel += 8
 	})
 	
+	const gameAnimation = {
+		animating: false
+	}
+	
 	const showGame = () => {
-		const visible = piece.visible
+		if (gameAnimation.animating) {
+			return
+		}
 		
-		pieceQuest.visible = !visible
-		piece.visible = !visible
-		func.visible = visible
-		cheese.visible = visible
+		gameAnimation.animating = true
+		gameAnimation.elapsed = 0
+		gameAnimation.showGame = !piece.visible
 	}
 	
 	onClick(title2, () => {
@@ -220,6 +224,7 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 	onClick(youtube, () => openInNewTab('https://www.youtube.com/@CodeOnBleu'))
 	onClick(linkedin, () => openInNewTab('https://www.linkedin.com/company/code-on-bleu'))
 	onClick(pieceQuest, () => window.location.href = '/piecequest')
+	onClick(piece, () => window.location.href = '/piecequest')
 	onClick(piece2, () => window.location.href = '/piecequest')
 	
 	app.ticker.add((time) => {
@@ -257,7 +262,7 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 		}
 		
 		cheese.rotation += 0.02 * dt * cheeseRotationDirection * (1 + cheeseAccel)
-		cheese.scale = ((Math.cos(cheese.rotation) + 1) / 4 + 0.5) * scale
+		cheese.scale = ((Math.cos(cheese.rotation) + 1) / 4 + 0.5)
 		cheeseAccel *= 0.99 - 0.01 * dt
 		
 		title1.tint = dynamicColor1.get()
@@ -267,5 +272,24 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 		slogan1.tint = dynamicColor3.get()
 		slogan2.tint = dynamicColor3.get(Math.PI / 2)
 		glowFilter.color = dynamicColor4.get()
+		
+		if (gameAnimation.animating) {
+			gameAnimation.elapsed += dt
+			
+			const elapsed = Math.min(2, gameAnimation.elapsed * 0.1)
+			let f = elapsed
+			const gameVisible = gameAnimation.showGame ? f >= 1 : f < 1
+			
+			gameContainer.scale = Math.abs(f - 1) * scale
+			
+			pieceQuest.visible = gameVisible
+			piece.visible = gameVisible
+			func.visible = !gameVisible
+			cheese.visible = !gameVisible
+			
+			if (elapsed == 2) {
+				gameAnimation.animating = false
+			}
+		}
 	})
 })()

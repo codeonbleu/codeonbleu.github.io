@@ -25,8 +25,6 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 	
 	textures.white = Texture.WHITE
 	
-	const isMobile = checkMobile()
-	
 	const newSprite = (textureKey, alpha) => {
 		const result = new Sprite(textures[textureKey])
 		result.anchor.set(0.5)
@@ -233,7 +231,7 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 		}
 		
 		pieceTime += 0.02 * dt * pieceRotationDirection * (1 + pieceAccel)
-		piece.scale = ((Math.cos(pieceTime) + 1) / 4 + 0.5) * scale * 0.8 * (scale * 550 / (scale * slogan1.y - scale * title1.y))
+		piece.scale = ((Math.cos(pieceTime) + 1) / 4 + 0.5) * scale * 0.8 * (1.4 * Math.sqrt(app.screen.height / app.screen.width))
 		pieceAccel *= 0.99 - 0.01 * dt
 		
 		title1.tint = dynamicColor1.get()
