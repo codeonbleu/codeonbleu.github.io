@@ -1,3 +1,5 @@
+// Copyright © 2024 Code on Bleu. All rights reserved.
+
 export const tau = 2 * Math.PI
 export const phi = (Math.sqrt(5) - 1) / 2
 

@@ -1,3 +1,5 @@
+// Copyright © 2024 Code on Bleu. All rights reserved.
+
 import {Page} from './page.mjs'
 
 Page.launch(class extends Page {
@@ -32,15 +34,12 @@ Page.launch(class extends Page {
 		this.onClick(this.scholar, () => this.load('/piecequest'))
 		this.onClick(this.pieceQuest, () => this.load('/piecequest'))
 		
-		const spinCheese = () => {
+		this.onClick(this.cheeseContainer, () => {
 			this.cheeseRotationDirection *= -1
 			this.dynamicColor4.update(1)
 			this.cheeseAccel += 8
 			this.glowAccel += 8
-		}
-		
-		this.onClick(this.cheese, spinCheese)
-		this.onClick(this.func, spinCheese)
+		})
 	}
 	
 	layout(screenWidth, screenHeight, centerX, centerY, scale) {

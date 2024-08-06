@@ -1,3 +1,5 @@
+// Copyright © 2024 Code on Bleu. All rights reserved.
+
 export const vertex = `
 in vec2 aPosition;
 out vec2 vTextureCoord;

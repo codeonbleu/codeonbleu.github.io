@@ -1,3 +1,5 @@
+// Copyright © 2024 Code on Bleu. All rights reserved.
+
 import {Application, Assets, Container, Graphics, Sprite, SCALE_MODES, Texture} from './pixi.min.mjs'
 import {AdvancedBloomFilter, BevelFilter, GlowFilter, AsciiFilter, DropShadowFilter} from './pixi-filters.mjs'
 import {assignIf, checkMobile, DynamicColor, openInNewTab, phi, tau} from './util.mjs'
@@ -31,6 +33,7 @@ export class Page {
 	
 	get app() { return this.#app }
 	get isMobile() { return this.#isMobile }
+	get textures() { return this.#textures }
 	get filters() { return this.#filters }
 	get mouseX() { return this.#mouseX }
 	get mouseY() { return this.#mouseY }
@@ -45,7 +48,8 @@ export class Page {
 			return
 		}
 		
-		const texture = await Assets.load('../media/' + key + '.png')
+		const path = '../'.repeat(this.settings.directoryDepth) + 'media/' + key + '.png'
+		const texture = await Assets.load(path)
 		texture.source.antialias = true
 		texture.source.scaleMode = SCALE_MODES.LINEAR
 		this.#textures[key] = texture
@@ -122,7 +126,8 @@ export class Page {
 			title: 'title',
 			slogan: 'slogan',
 			tmTitle: false,
-			tmSlogan: false
+			tmSlogan: false,
+			directoryDepth: 1
 		})
 		
 		const app = this.app
@@ -227,9 +232,9 @@ export class Page {
 		})
 		
 		this.dynamicColor4 = new DynamicColor({
-			r: {velocity: 4 / 3},
-			g: {velocity: 1.5},
-			b: {velocity: 1},
+			r: {velocity: 9 / 7},
+			g: {velocity: 13 / 9},
+			b: {velocity: 139 / 126},
 			elapse: 4
 		})
 		
