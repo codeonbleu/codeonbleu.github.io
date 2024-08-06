@@ -1,14 +1,12 @@
-import {CodeOnBleuPage} from './codeOnBleuPage.mjs'
+import {Page} from './page.mjs'
 
-class Page extends CodeOnBleuPage {
-	layout(screenWidth, screenHeight, centerX, centerY, scale) {
+Page.launch(class extends Page {
+	settings = {
+		title: 'pieceQuest',
+		slogan: 'comingSoon'
 	}
 	
-	update(time) {
-	}
-}
-
-await CodeOnBleuPage.init(Page, {
-	title: 'pieceQuest',
-	slogan: 'comingSoon'
+	init() {}
+	layout(screenWidth, screenHeight, centerX, centerY, scale) {}
+	update(time) {}
 })

@@ -3,20 +3,21 @@ import {AdvancedBloomFilter, BevelFilter, GlowFilter, AsciiFilter, DropShadowFil
 import {assignIf, checkMobile, makeDynamicColor, openInNewTab, phi, tau} from './util.mjs'
 import {makeJuliaFilter} from './shaders/julia.mjs'
 
-export class CodeOnBleuPage {
-	static async init(derivedClass, args) {
+export class Page {
+	static async launch(derivedClass) {
 		const page = new derivedClass()
-		await page.#init(args)
+		await page.#init()
 		return page
 	}
 	
-	#app
+	#app = new Application()
 	#isMobile = checkMobile()
 	#textures = {}
 	#mouseX = 0
 	#mouseY = 0
 	#scale = 1
 	
+	settings = {}
 	juliaTime = 40
 	pieceRotationDirection = 1
 	pieceAccel = 0
@@ -75,14 +76,12 @@ export class CodeOnBleuPage {
 		window.location.href = url
 	}
 	
-	async #init(args) {
-		args = assignIf(args, {
+	async #init() {
+		assignIf(this.settings, {
 			textures: [],
 			title: 'title',
 			slogan: 'slogan'
 		})
-		
-		this.#app = new Application()
 		
 		const app = this.app
 		
@@ -98,11 +97,11 @@ export class CodeOnBleuPage {
 		
 		document.body.appendChild(app.canvas)
 		
-		for (const key of [args.title, args.slogan, 'TM', 'cheese', 'facebook', 'linkedin', 'youtube', 'piece', 'pieceQuest']) {
+		for (const key of [this.settings.title, this.settings.slogan, 'TM', 'cheese', 'facebook', 'linkedin', 'youtube', 'piece', 'pieceQuest']) {
 			await this.loadTexture(key)
 		}
 		
-		for (const key of args.textures) {
+		for (const key of this.settings.textures) {
 			await this.loadTexture(key)
 		}
 		
@@ -118,10 +117,10 @@ export class CodeOnBleuPage {
 		this.rectangle2 = this.newGraphics()
 		this.rectangle1 = this.newGraphics()
 		this.cheese = this.newSprite('cheese') // TODO: derived class adds this
-		this.title1 = this.newSprite(args.title)
-		this.title2 = this.newSprite(args.title)
-		this.slogan1 = this.newSprite(args.slogan)
-		this.slogan2 = this.newSprite(args.slogan)
+		this.title1 = this.newSprite(this.settings.title)
+		this.title2 = this.newSprite(this.settings.title)
+		this.slogan1 = this.newSprite(this.settings.slogan)
+		this.slogan2 = this.newSprite(this.settings.slogan)
 		this.tmTitle = this.newSprite('TM', null, 0.125) // TODO: derived class adds this
 		this.facebook = this.newSprite('facebook')
 		this.linkedin = this.newSprite('linkedin')
@@ -220,7 +219,11 @@ export class CodeOnBleuPage {
 		this.#layout(true)
 		
 		app.ticker.add((time) => this.#update(time))
+		
+		this.init()
 	}
+	
+	init() {}
 	
 	#layoutQueued = false
 	
@@ -244,7 +247,8 @@ export class CodeOnBleuPage {
 		const screenHeight = this.screenHeight
 		const centerX = this.centerX
 		const centerY = this.centerY
-		const scale = screenWidth >= screenHeight ? screenHeight / 2048 : 0.85 * screenWidth / this.#textures.pieceQuest.width
+		const isHorizontalDisplay = screenWidth >= screenHeight
+		const scale = isHorizontalDisplay ? screenHeight / 2048 : 0.85 * screenWidth / this.#textures[this.settings.title].width
 		
 		this.#scale = scale
 	
@@ -257,7 +261,7 @@ export class CodeOnBleuPage {
 		for (const rectangle of [this.rectangle1, this.rectangle2, this.rectangle3]) {
 			rectangle.clear()
 			
-			if (screenWidth >= screenHeight) {
+			if (isHorizontalDisplay) {
 				rectangle.rect(0, 0, screenWidth, screenHeight).fill(0x060606)
 			} else {
 				const height = screenHeight * (phi + 0.1)
