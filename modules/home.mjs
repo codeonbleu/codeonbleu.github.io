@@ -9,7 +9,11 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
     await app.init({
 		background: '#111111',
 		resizeTo: window,
-		antialias: true
+		preference: 'webgpu',
+		antialias: true,
+		autoDensity: true,
+		resolution: window.devicePixelRatio,
+		powerPreference: 'high-performance'
 	})
 	
     document.body.appendChild(app.canvas)
@@ -136,6 +140,16 @@ import {makeJuliaFilter} from './shaders/julia.mjs'
 	const julia1 = makeJuliaFilter({maxIterations: maxIterations})
 	const julia2 = makeJuliaFilter({maxIterations: maxIterations})
 	const julia3 = makeJuliaFilter({maxIterations: maxIterations})
+	
+	bloomFilter.resolution = window.devicePixelRatio
+	glowFilter.resolution = window.devicePixelRatio
+	bevelFilter.resolution = window.devicePixelRatio
+	julia1.resolution = window.devicePixelRatio
+	julia2.resolution = window.devicePixelRatio
+	julia3.resolution = window.devicePixelRatio
+	asciiSmallFilter.resolution = window.devicePixelRatio
+	asciiFilter.resolution = window.devicePixelRatio
+	dropShadowFilter.resolution = window.devicePixelRatio
 	
 	rectangle3.filters = [julia3, asciiFilter, bloomFilter]
 	rectangle2.filters = [julia2, asciiFilter, bloomFilter]
