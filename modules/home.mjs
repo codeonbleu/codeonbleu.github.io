@@ -10,8 +10,7 @@ Page.launch(class extends Page {
 		tmSlogan: true,
 		julia: {
 			maxIterations: 10,
-			getReal: (time) => 0,
-			filters: Page.isMobile ? ['dot'] : ['dot', 'bloom', 'glow']
+			getReal: (time) => 0
 		},
 		enablePauseKey: true
 	}

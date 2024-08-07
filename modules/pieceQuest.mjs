@@ -10,8 +10,7 @@ Page.launch(class extends Page {
 		tmTitle: true,
 		tmSlogan: true,
 		julia: {
-			maxIterations: 20,
-			filters: Page.isMobile ? ['dot'] : ['dot', 'bloom', 'glow']
+			maxIterations: 20
 		}
 	}
 	
