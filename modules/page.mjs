@@ -1,8 +1,8 @@
 // Copyright © 2024 Code on Bleu. All rights reserved.
 
-import {Application, Assets, Container, Graphics, Sprite, SCALE_MODES, Texture} from './pixi.min.mjs'
-import {AdvancedBloomFilter, BevelFilter, DotFilter, GlowFilter, AsciiFilter, DropShadowFilter} from './pixi-filters.mjs'
-import {assignIf, checkMobile, DynamicColor, onKeyDown, openInNewTab, phi, tau} from './util.mjs'
+import {Application, Assets, Container, Graphics, RenderTexture, Sprite, SCALE_MODES, Text, Texture} from './pixi.min.mjs'
+import {AdvancedBloomFilter, AsciiFilter, BevelFilter, DotFilter, DropShadowFilter, GlowFilter} from './pixi-filters.mjs'
+import {assignIf, checkMobile, DynamicColor, onKeyDown, openInNewTab, phi, phi2, tau} from './util.mjs'
 import {JuliaFilter} from './shaders/julia.mjs'
 
 export class Page {
@@ -45,13 +45,14 @@ export class Page {
 	get centerX() { return this.app.screen.width / 2 }
 	get centerY() { return this.app.screen.height / 2 }
 	get scale() { return this.#scale }
+	get mediaDirectory() { return '../'.repeat(this.settings.directoryDepth) + 'media/' }
 	
 	async loadTexture(key) {
 		if (this.#textures[key] != null) {
 			return
 		}
 		
-		const path = '../'.repeat(this.settings.directoryDepth) + 'media/' + key + '.png'
+		const path = this.mediaDirectory + key + '.png'
 		const texture = await Assets.load(path)
 		texture.source.antialias = true
 		texture.source.scaleMode = SCALE_MODES.LINEAR
@@ -84,6 +85,58 @@ export class Page {
 	
 	newContainer(parentContainer) {
 		return this.addChild(new Container(), parentContainer)
+	}
+	
+	#storyText = null
+	
+	newStory(...parts) {
+		// Render text to a texture, because there was some latency seen on mobile otherwise
+		
+		let text = this.#storyText
+		
+		if (text == null) {
+			text = new Text({
+				text: '',
+				style: {
+					fontFamily: 'berkshireswash regular',
+					fontSize: 84,
+					fill: 0xffffff,
+					stroke: {color: '#000000', width: 30, join: 'round'},
+					align: 'center'
+				}
+			})
+			
+			text.anchor.set(0.5)
+			this.#storyText = text
+		}
+		
+		const result = this.newContainer(this.frameContainer)
+		
+		for (const part of parts) {
+			text.text = part
+			text.position.set(text.width / 2, text.height / 2)
+			
+			const renderTexture = RenderTexture.create({width: text.width, height: text.height})
+			renderTexture.source.antialias = true
+			renderTexture.source.scaleMode = SCALE_MODES.LINEAR
+			this.app.renderer.render(text, {renderTexture})
+			
+			const sprite = new Sprite(renderTexture)
+			sprite.anchor.set(0.5)
+			this.setFilters(sprite, 'glow', 'dropShadow')
+			result.addChild(sprite)
+		}
+		
+		result.isStory = true
+		result.storyFrame = 0
+		result.storyElapsed = 0
+		
+		this.onClick(result, () => {
+			result.storyFrame = (result.storyFrame + 1) % result.children.length
+			result.storyElapsed = 0
+		})
+		
+		return result
 	}
 	
 	setFilters(displayObject, ...filterKeys) {
@@ -157,6 +210,12 @@ export class Page {
 		
 		document.body.appendChild(app.canvas)
 		
+		Assets.addBundle('fonts', [
+			{alias: 'berkshireswash regular', src: this.mediaDirectory + 'berkshireswash-regular.ttf'}
+		])
+		
+		await Assets.loadBundle('fonts')
+		
 		for (const key of [settings.title, settings.slogan, 'facebook', 'linkedin', 'youtube']) {
 			await this.loadTexture(key)
 		}
@@ -194,7 +253,6 @@ export class Page {
 		
 		this.addFilter('bevel', new BevelFilter())
 		this.addFilter('asciiSmall', new AsciiFilter({size: 4, replaceColor: true}))
-		this.addFilter('ascii', new AsciiFilter({size: 16, replaceColor: true}))
 		this.addFilter('dot', new DotFilter({grayscale: false, scale: 0.1}), true)
 		this.addFilter('bloom', new AdvancedBloomFilter({threshold: 0.1}))
 		this.addFilter('glow', new GlowFilter())
@@ -276,8 +334,8 @@ export class Page {
 		
 		this.init()
 		
-		this.frameContainer.children.forEach((child, index) => {
-			child.visible = index == 0
+		this.frameContainer.children.forEach((frame, index) => {
+			frame.visible = index === 0
 		})
 		
 		app.renderer.on('resize', () => this.#layout(false))
@@ -357,6 +415,8 @@ export class Page {
 		filters.dropShadow.offsetY = 20 * scale
 		filters.glow.outerStrength = 10 * scale
 		filters.bloom.blur = 16 * scale
+		filters.dot.scale = 0.0707107/ Math.sqrt(scale)
+		console.debug(scale)
 		filters.julia1.setScreenDimensions(screenWidth, screenHeight)
 		filters.julia2.setScreenDimensions(screenWidth, screenHeight)
 		filters.julia3.setScreenDimensions(screenWidth, screenHeight)
@@ -365,6 +425,76 @@ export class Page {
 	}
 	
 	layout() {}
+	
+	#updateFrame(dt) {
+		const frameData = this.#frameData
+		
+		if (frameData.animating) {
+			frameData.elapsed += dt
+			
+			const elapsed = Math.min(2, frameData.elapsed * 0.1)
+			const currentVisible = elapsed < 1
+			const frameContainer = this.frameContainer
+			const frames = frameContainer.children
+			const nextFrame = frames[frameData.nextIndex]
+			
+			frameContainer.scale = Math.abs(elapsed - 1) * this.scale
+			frames[frameData.index].visible = currentVisible
+			nextFrame.visible = !currentVisible
+			
+			if (nextFrame.isStory) {
+				nextFrame.storyFrame = 0
+				nextFrame.storyElapsed = 0
+			}
+			
+			if (elapsed == 2) {
+				frameData.animating = false
+				frameData.index = frameData.nextIndex
+				frameData.nextIndex = null
+			}
+		}
+	}
+	
+	#updateStory(dt) {
+		const frames = this.frameContainer.children
+		
+		for (const frame of frames) {
+			if (frame.visible && frame.isStory) {
+				const texts = frame.children
+				const frameTime = 3
+				
+				frame.storyElapsed += dt * 0.01
+				
+				if (frame.storyElapsed >= frameTime) {
+					frame.storyElapsed = frame.storyElapsed % frameTime
+					frame.storyFrame = (frame.storyFrame + 1) % texts.length
+				}
+				
+				const text = texts[frame.storyFrame]
+				
+				for (const otherText of texts) {
+					otherText.visible = otherText === text
+				}
+				
+				const f = frame.storyElapsed / frameTime
+				const fadeF = 1 - phi2
+				const fadeIn = f < fadeF
+				const fadeOut = f > phi2
+				let alpha = 1
+			
+				if (fadeIn) {
+					alpha = f / fadeF
+				} else if(fadeOut) {
+					alpha = (1 - f) / fadeF
+				}
+				
+				text.alpha = alpha
+				text.tint = this.dynamicColor4.getInt()
+				
+				break
+			}
+		}
+	}
 	
 	#update(time) {
 		if (this.#paused) {
@@ -408,26 +538,8 @@ export class Page {
 		
 		filters.dot.angle = (this.juliaTime / -20) % tau
 		
-		const frameData = this.#frameData
-		
-		if (frameData.animating) {
-			frameData.elapsed += dt
-			
-			const elapsed = Math.min(2, frameData.elapsed * 0.1)
-			const currentVisible = elapsed < 1
-			const container = this.frameContainer
-			
-			container.scale = Math.abs(elapsed - 1) * this.scale
-			container.children[frameData.index].visible = currentVisible
-			container.children[frameData.nextIndex].visible = !currentVisible
-			
-			if (elapsed == 2) {
-				frameData.animating = false
-				frameData.index = frameData.nextIndex
-				frameData.nextIndex = null
-			}
-		}
-		
+		this.#updateFrame(dt)
+		this.#updateStory(dt)
 		this.update(time, dt)
 	}
 	

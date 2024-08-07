@@ -2,6 +2,7 @@
 
 export const tau = 2 * Math.PI
 export const phi = (Math.sqrt(5) - 1) / 2
+export const phi2 = 2 * phi - phi * phi
 
 export function assignIf(object, values) {
 	if (object == null) {

@@ -23,6 +23,20 @@ Page.launch(class extends Page {
 		
 		this.scholar = this.newSprite('scholar', this.frameContainer)
 		
+		this.newStory(
+			'Enter a universe...',
+			'where game pieces come to life!',
+			'Experience deep gameplay...',
+			'in several iterations and formats.',
+			'Welcome to the Piece Quest Saga!',
+			'Whether you enjoy JRPGs, TRPGs...',
+			'SRPGs, CRPGs, ARPGS, RTSs...',
+			'Sidescrollers, Deckbuilders, Auto-battlers...',
+			'or other rewarding game formats...',
+			'there will be a Piece Quest for you.',
+			'Join now while the adventure unfolds!'
+		)
+		
 		this.awakeningContainer = this.newContainer(this.frameContainer)
 		this.mage = this.newSprite('mage', this.awakeningContainer)
 		this.duelist = this.newSprite('duelist', this.awakeningContainer)
