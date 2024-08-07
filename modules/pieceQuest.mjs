@@ -48,8 +48,8 @@ Page.launch(class extends Page {
 		this.setFilters(this.scholar, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.mage, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.duelist, 'bevel', 'glow', 'dropShadow')
-		this.setFilters(this.awakening1, 'bevel', 'glow', 'dropShadow')
-		this.setFilters(this.awakening2, 'bevel', 'bloom', 'glow', 'asciiSmall')
+		this.setFilters(this.awakening1, 'glow', 'dropShadow')
+		this.setFilters(this.awakening2, 'bloom', 'glow', 'asciiSmall')
 		
 		this.onClick(this.cheese, () => this.load('../'))
 		
