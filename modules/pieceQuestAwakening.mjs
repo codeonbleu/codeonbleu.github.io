@@ -44,7 +44,6 @@ Page.launch(class extends Page {
 		})
 		
 		this.onClick(this.awakeningDescription, () => {
-			this.awakeningTimeRotationDirection *= -1
 			this.dynamicColor2.update(1)
 			this.glowAccel += 8
 		})

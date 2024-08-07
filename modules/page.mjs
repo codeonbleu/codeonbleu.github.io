@@ -1,9 +1,9 @@
 // Copyright © 2024 Code on Bleu. All rights reserved.
 
 import {Application, Assets, Container, Graphics, Sprite, SCALE_MODES, Texture} from './pixi.min.mjs'
-import {AdvancedBloomFilter, BevelFilter, GlowFilter, AsciiFilter, DropShadowFilter} from './pixi-filters.mjs'
-import {assignIf, checkMobile, DynamicColor, openInNewTab, phi, tau} from './util.mjs'
-import {makeJuliaFilter} from './shaders/julia.mjs'
+import {AdvancedBloomFilter, BevelFilter, DotFilter, GlowFilter, AsciiFilter, DropShadowFilter} from './pixi-filters.mjs'
+import {assignIf, checkMobile, DynamicColor, onKeyDown, openInNewTab, phi, tau} from './util.mjs'
+import {JuliaFilter} from './shaders/julia.mjs'
 
 export class Page {
 	static async launch(derivedClass) {
@@ -12,13 +12,14 @@ export class Page {
 		return page
 	}
 	
+	static #isMobile = checkMobile()
 	#app = new Application()
-	#isMobile = checkMobile()
 	#textures = {}
 	#filters = {}
 	#mouseX = 0
 	#mouseY = 0
 	#scale = 1
+	#paused = false
 	
 	#frameData = {
 		animating: false,
@@ -27,12 +28,13 @@ export class Page {
 	
 	settings = {}
 	juliaTime = 40
+	juliaAccel = 1
 	titleAccel = 0
 	glowAccel = 0
 	sloganAccel = 0
 	
+	static get isMobile() { return this.#isMobile }
 	get app() { return this.#app }
-	get isMobile() { return this.#isMobile }
 	get textures() { return this.#textures }
 	get filters() { return this.#filters }
 	get mouseX() { return this.#mouseX }
@@ -58,7 +60,7 @@ export class Page {
 	addFilter(key, filter, optimizeForMobile) {
 		this.#filters[key] = filter
 		
-		if (!optimizeForMobile || !this.isMobile) {
+		if (!optimizeForMobile || !Page.isMobile) {
 			filter.resolution = window.devicePixelRatio
 		}
 	}
@@ -127,7 +129,17 @@ export class Page {
 			slogan: 'slogan',
 			tmTitle: false,
 			tmSlogan: false,
-			directoryDepth: 1
+			directoryDepth: 1,
+			enablePauseKey: false,
+			julia: {}
+		})
+		
+		const julia = assignIf(settings.julia, {
+			enabled: true,
+			maxIterations: 10,
+			filters: ['ascii'],
+			getReal: (time) => Math.sin(time * 0.2),
+			getImag: (time) => Math.cos(time * 1.3 * 0.2)
 		})
 		
 		const app = this.app
@@ -156,20 +168,12 @@ export class Page {
 			await this.loadTexture(key)
 		}
 		
-		app.stage.eventMode = 'static'
-		app.stage.hitArea = app.screen
-		
-		app.stage.addEventListener('pointermove', (e) => {
-			this.#mouseX = e.global.x
-			this.#mouseY = e.global.y
-		})
-		
 		this.rectangle3 = this.newGraphics()
 		this.rectangle2 = this.newGraphics()
 		this.rectangle1 = this.newGraphics()
 		
-		this.title1 = this.newSprite(settings.title)
-		this.title2 = this.newSprite(settings.title)
+		this.title1 = this.newSprite(settings.title, null, phi)
+		this.title2 = this.newSprite(settings.title, null, phi)
 		
 		if (settings.tmTitle) {
 			this.tmTitle = this.newSprite('TM', null, 0.125)
@@ -190,18 +194,17 @@ export class Page {
 		this.addFilter('bevel', new BevelFilter())
 		this.addFilter('asciiSmall', new AsciiFilter({size: 4, replaceColor: true}))
 		this.addFilter('ascii', new AsciiFilter({size: 16, replaceColor: true}))
+		this.addFilter('dot', new DotFilter({grayscale: false, scale: 0.1}), true)
 		this.addFilter('bloom', new AdvancedBloomFilter({threshold: 0.1}))
 		this.addFilter('glow', new GlowFilter())
 		this.addFilter('dropShadow', new DropShadowFilter())
+		this.addFilter('julia1', new JuliaFilter({maxIterations: julia.maxIterations}), true)
+		this.addFilter('julia2', new JuliaFilter({maxIterations: julia.maxIterations}), true)
+		this.addFilter('julia3', new JuliaFilter({maxIterations: julia.maxIterations}), true)
 		
-		const maxIterations = 10
-		this.addFilter('julia1', makeJuliaFilter({maxIterations: maxIterations}), true)
-		this.addFilter('julia2', makeJuliaFilter({maxIterations: maxIterations}), true)
-		this.addFilter('julia3', makeJuliaFilter({maxIterations: maxIterations}), true)
-		
-		this.setFilters(this.rectangle3, 'julia3', 'ascii')
-		this.setFilters(this.rectangle2, 'julia2', 'ascii')
-		this.setFilters(this.rectangle1, 'julia1', 'ascii')
+		this.setFilters(this.rectangle3, 'julia3', ...julia.filters)
+		this.setFilters(this.rectangle2, 'julia2', ...julia.filters)
+		this.setFilters(this.rectangle1, 'julia1', ...julia.filters)
 		this.setFilters(this.title1, 'bloom', 'glow', 'dropShadow')
 		this.setFilters(this.title2, 'bloom', 'glow', 'asciiSmall')
 		this.setFilters(this.slogan1, 'bevel', 'bloom', 'glow', 'dropShadow')
@@ -237,6 +240,22 @@ export class Page {
 			b: {velocity: 139 / 126},
 			elapse: 4
 		})
+		
+		app.stage.eventMode = 'static'
+		app.stage.hitArea = app.screen
+		
+		app.stage.addEventListener('pointermove', (e) => {
+			this.#mouseX = e.global.x
+			this.#mouseY = e.global.y
+		})
+		
+		if (settings.enablePauseKey) {
+			onKeyDown((keyCode) => {
+				if (keyCode == 80) {
+					this.#paused = !this.#paused
+				}
+			})
+		}
 		
 		this.onClick(this.title2, () => {
 			this.dynamicColor1.update(1)
@@ -337,6 +356,9 @@ export class Page {
 		filters.dropShadow.offsetY = 20 * scale
 		filters.glow.outerStrength = 10 * scale
 		filters.bloom.blur = 16 * scale
+		filters.julia1.setScreenDimensions(screenWidth, screenHeight)
+		filters.julia2.setScreenDimensions(screenWidth, screenHeight)
+		filters.julia3.setScreenDimensions(screenWidth, screenHeight)
 		
 		this.layout(screenWidth, screenHeight, centerX, centerY, scale, isHorizontalDisplay)
 	}
@@ -344,8 +366,13 @@ export class Page {
 	layout() {}
 	
 	#update(time) {
+		if (this.#paused) {
+			time.deltaTime = 0
+		}
+		
 		const dt = time.deltaTime
 		const filters = this.filters
+		const julia  = this.settings.julia
 		
 		this.dynamicColor1.update(dt / 100 * (1 + this.titleAccel))
 		this.dynamicColor2.update(dt / 100 * (1 + this.glowAccel))
@@ -356,32 +383,29 @@ export class Page {
 		this.glowAccel *= 0.99 - 0.01 * dt
 		this.sloganAccel *= 0.99 - 0.001 * dt
 		
-		this.juliaTime += 0.04 * dt
-		filters.julia1.resources.testUniforms.uniforms.uTime = this.juliaTime
-		filters.julia1.resources.testUniforms.uniforms.uRealC = Math.sin(this.juliaTime * 0.2)
-		filters.julia1.resources.testUniforms.uniforms.UImagC = Math.cos(this.juliaTime * 1.3 * 0.2)
-		filters.julia1.resources.testUniforms.uniforms.uScreenWidth = this.screenWidth
-		filters.julia1.resources.testUniforms.uniforms.uScreenHeight = this.screenHeight
+		this.juliaTime += 0.04 * dt * (1 + this.juliaAccel)
+		this.juliaAccel *= 0.99 - 0.001 * dt
+		filters.julia1.time = this.juliaTime
+		filters.julia1.realC = julia.getReal(this.juliaTime)
+		filters.julia1.imagC = julia.getImag(this.juliaTime)
 		
 		const juliaTime2 = this.juliaTime * 1.3
-		filters.julia2.resources.testUniforms.uniforms.uTime = juliaTime2
-		filters.julia2.resources.testUniforms.uniforms.uRealC = Math.sin(juliaTime2 * 0.2)
-		filters.julia2.resources.testUniforms.uniforms.UImagC = Math.cos(juliaTime2 * 1.3 * 0.2)
-		filters.julia2.resources.testUniforms.uniforms.uScreenWidth = this.screenWidth
-		filters.julia2.resources.testUniforms.uniforms.uScreenHeight = this.screenHeight
+		filters.julia2.time = juliaTime2
+		filters.julia2.realC = julia.getReal(juliaTime2)
+		filters.julia2.imagC = julia.getImag(juliaTime2)
 		
 		const juliaTime3 = juliaTime2 * 1.3
-		filters.julia3.resources.testUniforms.uniforms.uTime = juliaTime3
-		filters.julia3.resources.testUniforms.uniforms.uRealC = Math.sin(juliaTime3 * 0.2)
-		filters.julia3.resources.testUniforms.uniforms.UImagC = Math.cos(juliaTime3 * 1.3 * 0.2)
-		filters.julia3.resources.testUniforms.uniforms.uScreenWidth = this.screenWidth
-		filters.julia3.resources.testUniforms.uniforms.uScreenHeight = this.screenHeight
+		filters.julia3.time = juliaTime3
+		filters.julia3.realC = julia.getReal(juliaTime3)
+		filters.julia3.imagC = julia.getImag(juliaTime3)
 		
 		this.title1.tint = this.dynamicColor1.getInt()
 		this.title2.tint = this.dynamicColor1.getInt(Math.PI / 2)
 		filters.glow.color = this.dynamicColor2.getInt()
 		this.slogan1.tint = this.dynamicColor3.getInt()
 		this.slogan2.tint = this.dynamicColor3.getInt(Math.PI / 2)
+		
+		filters.dot.angle = (this.juliaTime / -20) % tau
 		
 		const frameData = this.#frameData
 		

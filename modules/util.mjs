@@ -77,3 +77,11 @@ export function checkMobile() {
 export function openInNewTab(url) {
 	window.open(url, '_blank', 'noopener,noreferrer').focus()
 }
+
+export function onKeyDown(callback) {
+	window.addEventListener('keydown', function(event) {
+		if (callback(event.keyCode)) {
+			event.preventDefault()
+		}
+	})
+}

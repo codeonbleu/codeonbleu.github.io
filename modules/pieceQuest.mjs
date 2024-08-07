@@ -8,7 +8,11 @@ Page.launch(class extends Page {
 		slogan: 'epicFranchise',
 		textures: ['scholar', 'duelist', 'mage', 'cheese', 'awakening'],
 		tmTitle: true,
-		tmSlogan: true
+		tmSlogan: true,
+		julia: {
+			maxIterations: 20,
+			filters: Page.isMobile ? ['dot'] : ['dot', 'bloom', 'glow']
+		}
 	}
 	
 	scholarTime = 0
@@ -40,6 +44,7 @@ Page.launch(class extends Page {
 			this.scholarRotationDirection *= -1
 			this.dynamicColor2.update(1)
 			this.glowAccel += 8
+			this.juliaAccel += 16
 		})
 		
 		this.onClick(this.duelist2, () => this.load('awakening/'))

@@ -3,12 +3,13 @@
 import {Filter, GlProgram} from './../pixi.min.mjs'
 import {vertex} from './defaultVertex.mjs'
 
-export function makeJuliaFilter(args) {
-	args = args || {}
-	
-	const maxIterations = Math.floor(args.maxIterations == null ? 10 : args.maxIterations)
-	
-	const fragment = `
+export class JuliaFilter extends Filter {
+	constructor(args) {
+		args = args || {}
+		
+		const maxIterations = Math.floor(args.maxIterations == null ? 10 : args.maxIterations)
+		
+		const fragment = `
 in vec2 vTextureCoord;
 
 uniform float uTime;
@@ -45,19 +46,37 @@ void main() {
     gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
 }`
 
-	return new Filter({
-		glProgram: GlProgram.from({
-			fragment,
-			vertex
-		}),
-		resources: {
-			testUniforms: {
-				uTime: {value: 0.0, type: 'f32'},
-				uScreenWidth: {value: 0.0, type: 'f32'},
-				uScreenHeight: {value: 0.0, type: 'f32'},
-				uRealC: {value: 0.0, type: 'f32'},
-				uImagC: {value: 0.0, type: 'f32'}
+		super({
+			glProgram: GlProgram.from({
+				fragment,
+				vertex
+			}),
+			resources: {
+				main: {
+					uTime: {value: 0.0, type: 'f32'},
+					uScreenWidth: {value: 0.0, type: 'f32'},
+					uScreenHeight: {value: 0.0, type: 'f32'},
+					uRealC: {value: 0.0, type: 'f32'},
+					uImagC: {value: 0.0, type: 'f32'}
+				}
 			}
-		}
-	})
+		})
+	}
+	
+	#get(key) { console.debug('got ' + key); return this.resources.main.uniforms[key] }
+	#set(key, value) { this.resources.main.uniforms[key] = value }
+	
+	get time() { return this.#get('uTime') }
+	set time(value) { this.#set('uTime', value) }
+	
+	get realC() { return this.#get('uRealC') }
+	set realC(value) { this.#set('uRealC', value) }
+	
+	get imagC() { return this.#get('uImagC') }
+	set imagC(value) { this.#set('uImagC', value) }
+	
+	setScreenDimensions(width, height) {
+		this.#set('uScreenWidth', width)
+		this.#set('uScreenHeight', height)
+	}
 }
