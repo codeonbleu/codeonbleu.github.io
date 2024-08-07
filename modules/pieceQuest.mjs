@@ -27,13 +27,13 @@ Page.launch(class extends Page {
 		this.mage = this.newSprite('mage', this.awakeningContainer)
 		this.duelist = this.newSprite('duelist', this.awakeningContainer)
 		this.awakening1 = this.newSprite('awakening', this.awakeningContainer)
-		this.awakening2 = this.newSprite('awakening', this.awakeningContainer)
+		this.awakening2 = this.newSprite('awakening', this.awakeningContainer, Page.overlayAlpha)
 		
 		this.setFilters(this.cheese, 'glow', 'dropShadow')
 		this.setFilters(this.duelist2, 'glow', 'dropShadow')
 		this.setFilters(this.scholar, 'bevel', 'glow', 'dropShadow')
-		this.setFilters(this.mage, 'bevel', 'dropShadow')
-		this.setFilters(this.duelist, 'bevel', 'dropShadow')
+		this.setFilters(this.mage, 'bevel', 'glow', 'dropShadow')
+		this.setFilters(this.duelist, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.awakening1, 'bevel', 'bloom', 'glow', 'dropShadow')
 		this.setFilters(this.awakening2, 'bevel', 'bloom', 'glow', 'asciiSmall')
 		

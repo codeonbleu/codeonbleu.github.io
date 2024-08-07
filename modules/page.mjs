@@ -34,6 +34,7 @@ export class Page {
 	sloganAccel = 0
 	
 	static get isMobile() { return this.#isMobile }
+	static get overlayAlpha() { return 0.5 }
 	get app() { return this.#app }
 	get textures() { return this.#textures }
 	get filters() { return this.#filters }
@@ -172,15 +173,15 @@ export class Page {
 		this.rectangle2 = this.newGraphics()
 		this.rectangle1 = this.newGraphics()
 		
-		this.title1 = this.newSprite(settings.title, null, phi)
-		this.title2 = this.newSprite(settings.title, null, phi)
+		this.title1 = this.newSprite(settings.title)
+		this.title2 = this.newSprite(settings.title, null, Page.overlayAlpha)
 		
 		if (settings.tmTitle) {
 			this.tmTitle = this.newSprite('TM', null, 0.125)
 		}
 		
 		this.slogan1 = this.newSprite(settings.slogan)
-		this.slogan2 = this.newSprite(settings.slogan)
+		this.slogan2 = this.newSprite(settings.slogan, null, Page.overlayAlpha)
 		
 		if (settings.tmSlogan) {
 			this.tmSlogan = this.newSprite('TM', null, 0.125)
