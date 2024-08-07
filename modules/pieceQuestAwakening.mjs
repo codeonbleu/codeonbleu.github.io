@@ -29,6 +29,7 @@ Page.launch(class extends Page {
 			'Embark on an epic adventure to save the world!',
 			'Engage in highly strategic gameplay,\nrelying on your wits and creativity for survival.',
 			'With abundant character classes and unique encounters,\nno two games are ever the same.',
+			'Coming soon!',
 			'Genre: RPG, Tactical, Rougelike, Deckbuilding '
 		)
 		

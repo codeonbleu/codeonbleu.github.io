@@ -31,10 +31,10 @@ Page.launch(class extends Page {
 			'Welcome to the Piece Quest Saga!',
 			'Whether you enjoy JRPGs, TRPGs...',
 			'SRPGs, CRPGs, ARPGS, RTSs...',
-			'Sidescrollers, Deckbuilders, Auto-battlers...',
-			'or other rewarding game formats...',
-			'there will be a Piece Quest for you.',
-			'Join now while the adventure unfolds!'
+			'Rougelikes, Sidescrollers, Deckbuilders, Auto-battlers,\nor other intriguing game formats...',
+			'there will be a Piece Quest for you!',
+			'Beginning with Piece Quest: Awakening...',
+			'Join now as the adventure unfolds!'
 		)
 		
 		this.awakeningContainer = this.newContainer(this.frameContainer)
@@ -48,7 +48,7 @@ Page.launch(class extends Page {
 		this.setFilters(this.scholar, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.mage, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.duelist, 'bevel', 'glow', 'dropShadow')
-		this.setFilters(this.awakening1, 'bevel', 'bloom', 'glow', 'dropShadow')
+		this.setFilters(this.awakening1, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.awakening2, 'bevel', 'bloom', 'glow', 'asciiSmall')
 		
 		this.onClick(this.cheese, () => this.load('../'))

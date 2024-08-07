@@ -33,8 +33,8 @@ Page.launch(class extends Page {
 			'and which feature deep customization\nthrough deceptively complex mechanics.',
 			'Through creativity, experimentation, and exploration...',
 			'players shall conquer impossible feats\nand discover endless replayability!',
-			'Starting with Piece Quest...',
-			'Join now as the adventure unfolds!'
+			'Starting with the Piece Quest Saga...',
+			'an epic adventure is about to unfold!'
 		)
 		
 		this.pieceQuestContainer = this.newContainer(this.frameContainer)
@@ -46,7 +46,7 @@ Page.launch(class extends Page {
 		this.setFilters(this.cheese, 'dropShadow')
 		this.setFilters(this.func, 'bloom', 'dropShadow')
 		this.setFilters(this.scholar, 'bevel', 'glow', 'dropShadow')
-		this.setFilters(this.pieceQuest1, 'bloom', 'glow', 'dropShadow')
+		this.setFilters(this.pieceQuest1, 'glow', 'dropShadow')
 		this.setFilters(this.pieceQuest2, 'bloom', 'glow', 'asciiSmall')
 	
 		this.onClick(this.scholar2, () => this.load('/piecequest'))
