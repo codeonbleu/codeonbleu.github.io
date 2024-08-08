@@ -191,7 +191,9 @@ export class Page {
 		const julia = assignIf(settings.julia, {
 			enabled: true,
 			maxIterations: 10,
-			filters: Page.isMobile ? ['dot'] : ['dot', 'bloom', 'glow'],
+			//filters: Page.isMobile ? ['dot'] : ['dot', 'bloom', 'glow'],
+			//filters: ['dot', 'glow'],
+			filters: ['dot'],
 			getReal: (time) => Math.sin(time * 0.2),
 			getImag: (time) => Math.cos(time * 1.3 * 0.2)
 		})
