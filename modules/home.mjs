@@ -71,9 +71,12 @@ export class HomePage extends Page {
 		this.func.position.set(-140, 30)
 		this.title1.scale.set(0.85)
 		this.title2.scale.set(0.85)
+		this.pieceQuestContainer.scale.set(isHorizontalDisplay ? 0.85 : 1)
 	}
 	
 	update(time, dt) {
+		this.title2.alpha = 1
+		
 		this.cheese.tint = this.getDynamicColor(3).getInt()
 		this.cheese.rotation += 0.02 * dt * this.cheeseRotationDirection * (1 + this.cheeseAccel)
 		this.cheese.scale = ((Math.cos(this.cheese.rotation) + 1) / 4 + 0.5)

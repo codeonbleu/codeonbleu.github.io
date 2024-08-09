@@ -167,28 +167,28 @@ export class PageController {
 			r: {velocity: 1},
 			g: {velocity: 1.5},
 			b: {velocity: 4 / 3},
-			elapse: 4
+			elapse: 8
 		})
 		
 		this.#pushNewDynamicColor({
 			r: {velocity: 1.5},
 			g: {velocity: 4 / 3},
 			b: {velocity: 1},
-			elapse: 4
+			elapse: 8
 		})
 		
 		this.#pushNewDynamicColor({
 			r: {velocity: 4 / 3},
 			g: {velocity: 1},
 			b: {velocity: 1.5},
-			elapse: 4
+			elapse: 8
 		})
 		
 		this.#pushNewDynamicColor({
 			r: {velocity: 9 / 7},
 			g: {velocity: 13 / 9},
 			b: {velocity: 139 / 126},
-			elapse: 4
+			elapse: 8
 		})
 		
 		this.onClick(this.#expand, toggleFullscreen)
