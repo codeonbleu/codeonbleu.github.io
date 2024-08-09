@@ -1,8 +1,10 @@
 // Copyright © 2024 Code on Bleu. All rights reserved.
 
+'use strict'
+
 import {Page} from './page.mjs'
 
-Page.launch(class extends Page {
+export class PieceQuestPage extends Page {
 	settings = {
 		title: 'pieceQuest',
 		slogan: 'epicFranchise',
@@ -23,25 +25,26 @@ Page.launch(class extends Page {
 		
 		this.scholar = this.newSprite('scholar', this.frameContainer)
 		
-		this.newStory(
+		this.addNewStory(
 			'Enter a universe...',
-			'where game pieces come to life!',
+			'where game pieces\ncome to life!',
 			'Experience deep gameplay...',
-			'in several iterations and formats.',
-			'Welcome to the Piece Quest Saga!',
-			'Whether you enjoy JRPGs, TRPGs...',
-			'SRPGs, CRPGs, ARPGS, RTSs...',
-			'Rougelikes, Sidescrollers, Deckbuilders, Auto-battlers,\nor other intriguing game formats...',
-			'there will be a Piece Quest for you!',
-			'Beginning with Piece Quest: Awakening...',
-			'Join now as the adventure unfolds!'
+			'in several iterations\nand formats.',
+			'Welcome to the\nPiece Quest Saga!',
+			'Whether you enjoy\nJRPGs, TRPGs...',
+			'SRPGs, CRPGs,\nARPGS, RTSs...',
+			'Rougelikes, Sidescrollers,\nDeckbuilders, Auto-battlers...',
+			'or other intriguing\ngame formats...',
+			'there will be a\nPiece Quest for you!',
+			'Beginning with\nPiece Quest: Awakening...',
+			'Join now as the\nadventure unfolds!'
 		)
 		
 		this.awakeningContainer = this.newContainer(this.frameContainer)
 		this.mage = this.newSprite('mage', this.awakeningContainer)
 		this.duelist = this.newSprite('duelist', this.awakeningContainer)
 		this.awakening1 = this.newSprite('awakening', this.awakeningContainer)
-		this.awakening2 = this.newSprite('awakening', this.awakeningContainer, Page.overlayAlpha)
+		this.awakening2 = this.newSprite('awakening', this.awakeningContainer, this.controller.overlayAlpha)
 		
 		this.setFilters(this.cheese, 'glow', 'dropShadow')
 		this.setFilters(this.duelist2, 'glow', 'dropShadow')
@@ -51,37 +54,28 @@ Page.launch(class extends Page {
 		this.setFilters(this.awakening1, 'glow', 'dropShadow')
 		this.setFilters(this.awakening2, 'bloom', 'glow', 'asciiSmall')
 		
-		this.onClick(this.cheese, () => this.load('../'))
+		this.onClick(this.cheese, () => this.loadPage('home'))
+		this.onClick(this.duelist2, () => this.loadPage('pieceQuestAwakening'))
 		
 		this.onClick(this.scholar, () => {
 			this.scholarRotationDirection *= -1
-			this.dynamicColor2.update(1)
-			this.glowAccel += 8
-			this.juliaAccel += 16
+			this.getDynamicColor(1).update(1)
+			this.controller.glowAccel += 8
+			this.controller.juliaAccel += 16
 		})
 		
-		this.onClick(this.duelist2, () => this.load('awakening/'))
-		this.onClick(this.mage, () => this.load('awakening/'))
-		this.onClick(this.duelist, () => this.load('awakening/'))
-		this.onClick(this.awakening2, () => this.load('awakening/'))
+		this.onClick(this.awakeningContainer, () => this.loadPage('pieceQuestAwakening'))
 	}
 	
-	layout(screenWidth, screenHeight, centerX, centerY, scale) {
-		this.position(this.cheese, 90 * scale, 100 * scale, 0.15)
-		this.position(this.duelist2, 250 * scale, 90 * scale, 0.15)
+	layout() {
+		this.position(this.cheese, -0.94, -0.87, 0.15)
+		this.position(this.duelist2, -0.88, -0.87, 0.15)
 		
 		//this.scholar.y = 100
 		
 		this.awakeningContainer.scale.set(0.75)
-		
-		this.mage.x = -this.textures.awakening.width / 2 - 10
-		this.mage.y = 50
-		this.mage.scale.set(0.95)
-		
-		this.duelist.x = this.textures.awakening.width / 2 + 10
-		this.duelist.y = 50
-		this.duelist.scale.set(0.9)
-		//this.duelist.scale.x = -this.duelist.scale.x
+		this.position(this.mage, -0.5, 0, 0.95)
+		this.position(this.duelist, 0.5, 0, 0.9)
 		
 		this.awakening1.y = 100
 		this.awakening2.y = this.awakening1.y
@@ -90,9 +84,9 @@ Page.launch(class extends Page {
 	}
 	
 	update(time, dt) {
-		this.scholarTime += 0.02 * dt * this.scholarRotationDirection * (1 + this.glowAccel)
-		this.scholar.scale = ((Math.cos(this.scholarTime) + 1) / 4 + 0.5) * 0.8 * (1.4 * Math.sqrt(this.screenHeight / this.screenWidth))
-		this.awakening1.tint = this.dynamicColor4.getInt()
-		this.awakening2.tint = this.dynamicColor4.getInt(Math.PI / 2)
+		this.scholarTime += 0.02 * dt * this.scholarRotationDirection * (1 + this.controller.glowAccel)
+		this.scholar.scale = ((Math.cos(this.scholarTime) + 1) / 4 + 0.5) * 0.8 * (1.4 * Math.sqrt(this.controller.screenHeight / this.controller.screenWidth))
+		this.awakening1.tint = this.getDynamicColor(3).getInt()
+		this.awakening2.tint = this.getDynamicColor(3).getInt(Math.PI / 2)
 	}
-})
+}

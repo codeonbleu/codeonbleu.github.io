@@ -1,5 +1,7 @@
 // Copyright © 2024 Code on Bleu. All rights reserved.
 
+'use strict'
+
 import {Filter, GlProgram} from './../pixi.min.mjs'
 import {vertex} from './defaultVertex.mjs'
 

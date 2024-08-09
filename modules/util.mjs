@@ -1,5 +1,7 @@
 // Copyright © 2024 Code on Bleu. All rights reserved.
 
+'use strict'
+
 export const tau = 2 * Math.PI
 export const phi = (Math.sqrt(5) - 1) / 2
 export const phi2 = 2 * phi - phi * phi
@@ -85,4 +87,12 @@ export function onKeyDown(callback) {
 			event.preventDefault()
 		}
 	})
+}
+
+export function toggleFullscreen() {
+	if (document.fullscreen) {
+		document.exitFullscreen()
+	} else {
+		document.body.requestFullscreen()
+	}
 }
