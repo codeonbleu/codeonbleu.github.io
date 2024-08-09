@@ -605,7 +605,5 @@ export class PageController {
 		
 		this.#updatePageFade(dt)
 		page.updateBase(time, dt)
-		
-		console.debug('FPS: ' + this.#app.ticker.FPS)
 	}
 }
