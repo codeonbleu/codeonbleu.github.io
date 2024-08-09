@@ -71,6 +71,8 @@ export class HomePage extends Page {
 		this.func.position.set(-140, 30)
 		this.title1.scale.set(0.85)
 		this.title2.scale.set(0.85)
+		this.slogan1.scale.set(isHorizontalDisplay ? 0.85 : 1)
+		this.slogan2.scale.set(isHorizontalDisplay ? 0.85 : 1)
 		this.pieceQuestContainer.scale.set(isHorizontalDisplay ? 0.85 : 1)
 	}
 	
