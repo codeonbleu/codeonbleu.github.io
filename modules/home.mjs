@@ -69,6 +69,8 @@ export class HomePage extends Page {
 	
 	layout(screenWidth, screenHeight, centerX, centerY, isHorizontalDisplay) {
 		this.func.position.set(-140, 30)
+		this.title1.scale.set(0.85)
+		this.title2.scale.set(0.85)
 	}
 	
 	update(time, dt) {
