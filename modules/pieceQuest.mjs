@@ -12,7 +12,7 @@ export class PieceQuestPage extends Page {
 		tmTitle: true,
 		tmSlogan: true,
 		julia: {
-			maxIterations: 20
+			maxIterations: 15
 		},
 		ui: [
 			{texture: 'cheese', page: 'home'},

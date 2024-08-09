@@ -184,9 +184,9 @@ export class Page {
 	reload() {
 		const controller = this.#controller
 		
-		controller.addFilter('julia1', this.julia1, true)
-		controller.addFilter('julia2', this.julia2, true)
-		controller.addFilter('julia3', this.julia3, true)
+		controller.addFilter('julia1', this.julia1, 1)
+		controller.addFilter('julia2', this.julia2, 1)
+		controller.addFilter('julia3', this.julia3, 1)
 		
 		this.#resetFrames()
 	}
