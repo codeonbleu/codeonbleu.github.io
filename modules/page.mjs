@@ -17,6 +17,8 @@ export class Page {
 	
 	#controller = null
 	#container = new Container()
+	#ui = []
+	#story = null
 	frameContainer = null
 	
 	julia1 = null
@@ -55,28 +57,37 @@ export class Page {
 		this.#controller.onClick(displayObject, callback)
 	}
 	
-	addNewStory(...parts) {
-		const story = this.newContainer(this.frameContainer)
+	addStory() {
+		const story = this.#story
 		
-		let index = 0
-		const texts = []
-		
-		const addText = () => {
-			texts.push(this.#controller.newStoryText(parts[index]))
-			++index
-			
-			if (index < parts.length) {
-				this.#controller.addOnce(addText)
-			} else {
-				texts.forEach((text) => story.addChild(text))
-			}
+		if (story == null) {
+			return
 		}
 		
-		this.#controller.addOnce(addText)
+		this.frameContainer.addChild(story)
+	}
+	
+	#createStoryPart(part) {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve(this.#controller.newStoryText(part))
+			})
+		})
+	}
+	
+	async #createStory(parts) {
+		const story = new Container()
 		
 		story.isStory = true
 		story.storyFrame = 0
 		story.storyElapsed = 0
+		
+		this.#story = story
+		
+		for (const part of this.settings.story) {
+			const text = await this.#createStoryPart(part)
+			story.addChild(text)
+		}
 		
 		this.onClick(story, () => {
 			story.storyFrame = (story.storyFrame + 1) % story.children.length
@@ -95,6 +106,7 @@ export class Page {
 			slogan: 'slogan',
 			tmTitle: false,
 			tmSlogan: false,
+			ui: [],
 			julia: {}
 		})
 		
@@ -111,6 +123,16 @@ export class Page {
 		
 		await controller.loadTextures(settings.title, settings.slogan)
 		await controller.loadTextures(...settings.textures)
+		
+		for (const element of settings.ui) { 
+			const textureKey = element.texture
+			const page = element.page
+			await controller.loadTexture(textureKey)
+			const sprite = this.newSprite(textureKey)
+			this.setFilters(sprite, 'glow', 'dropShadow')
+			this.onClick(sprite, () => this.loadPage(page))
+			this.#ui.push(sprite)
+		}
 		
 		this.title1 = this.newSprite(settings.title)
 		this.title2 = this.newSprite(settings.title, null, controller.overlayAlpha)
@@ -136,6 +158,10 @@ export class Page {
 		this.setFilters(this.title2, 'bloom', 'glow', 'asciiSmall')
 		this.setFilters(this.slogan1, 'glow', 'dropShadow')
 		this.setFilters(this.slogan2, 'bloom', 'asciiSmall')
+		
+		if (settings.story != null) {
+			await this.#createStory()
+		}
 		
 		this.onClick(this.title2, () => {
 			controller.getDynamicColor(0).update(1)
@@ -169,7 +195,7 @@ export class Page {
 		return this.#controller.position(displayObject, xPercent, yPercent, scale)
 	}
 	
-	layoutBase() {
+	layoutBase(screenWidth, screenHeight, centerX, centerY, isHorizontalDisplay) {
 		const titleF = phi + 0.05
 		
 		this.position(this.title1, 0, -phi)
@@ -186,16 +212,25 @@ export class Page {
 			this.tmSlogan.position.set(this.slogan1.x + this.slogan1.width / 2 + 80, this.slogan1.y - this.slogan1.height * 0.4)
 		}
 		
+		this.controller.arrangeUi({
+			align: 'left',
+			y: -centerY + (isHorizontalDisplay ? 150 : 200),
+			x: -centerX + (isHorizontalDisplay ? 50 : 75),
+			spacing: 40,
+			scale: isHorizontalDisplay ? 0.2 : 0.3,
+			elements: this.#ui
+		})
+		
 		this.frameContainer.children.forEach((frame, index) => {
 			if (frame.isStory) {
-				frame.scale.set(this.controller.isHorizontalDisplay ? 1 : 1.5)
+				frame.scale.set(isHorizontalDisplay ? 1 : 1.5)
 			}
 		})
 		
-		this.layout()
+		this.layout(screenWidth, screenHeight, centerX, centerY, isHorizontalDisplay)
 	}
 	
-	layout() {}
+	layout(screenWidth, screenHeight, centerX, centerY, isHorizontalDisplay) {}
 	
 	#resetFrames() {
 		const data = this.#frameData

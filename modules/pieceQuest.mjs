@@ -8,24 +8,17 @@ export class PieceQuestPage extends Page {
 	settings = {
 		title: 'pieceQuest',
 		slogan: 'epicFranchise',
-		textures: ['scholar', 'duelist', 'mage', 'cheese', 'awakening'],
+		textures: ['scholar', 'mage', 'awakening'],
 		tmTitle: true,
 		tmSlogan: true,
 		julia: {
 			maxIterations: 20
-		}
-	}
-	
-	scholarTime = 0
-	scholarRotationDirection = 1
-	
-	init() {
-		this.cheese = this.newSprite('cheese')
-		this.duelist2 = this.newSprite('duelist')
-		
-		this.scholar = this.newSprite('scholar', this.frameContainer)
-		
-		this.addNewStory(
+		},
+		ui: [
+			{texture: 'cheese', page: 'home'},
+			{texture: 'duelist', page: 'pieceQuestAwakening'}
+		],
+		story: [
 			'Enter a universe...',
 			'where game pieces\ncome to life!',
 			'Experience deep gameplay...',
@@ -38,7 +31,15 @@ export class PieceQuestPage extends Page {
 			'there will be a\nPiece Quest for you!',
 			'Beginning with\nPiece Quest: Awakening...',
 			'Join now as the\nadventure unfolds!'
-		)
+		]
+	}
+	
+	scholarTime = 0
+	scholarRotationDirection = 1
+	
+	init() {
+		this.scholar = this.newSprite('scholar', this.frameContainer)
+		this.addStory()
 		
 		this.awakeningContainer = this.newContainer(this.frameContainer)
 		this.mage = this.newSprite('mage', this.awakeningContainer)
@@ -46,16 +47,11 @@ export class PieceQuestPage extends Page {
 		this.awakening1 = this.newSprite('awakening', this.awakeningContainer)
 		this.awakening2 = this.newSprite('awakening', this.awakeningContainer, this.controller.overlayAlpha)
 		
-		this.setFilters(this.cheese, 'glow', 'dropShadow')
-		this.setFilters(this.duelist2, 'glow', 'dropShadow')
 		this.setFilters(this.scholar, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.mage, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.duelist, 'bevel', 'glow', 'dropShadow')
 		this.setFilters(this.awakening1, 'glow', 'dropShadow')
 		this.setFilters(this.awakening2, 'bloom', 'glow', 'asciiSmall')
-		
-		this.onClick(this.cheese, () => this.loadPage('home'))
-		this.onClick(this.duelist2, () => this.loadPage('pieceQuestAwakening'))
 		
 		this.onClick(this.scholar, () => {
 			this.scholarRotationDirection *= -1
@@ -67,20 +63,22 @@ export class PieceQuestPage extends Page {
 		this.onClick(this.awakeningContainer, () => this.loadPage('pieceQuestAwakening'))
 	}
 	
-	layout() {
-		this.position(this.cheese, -0.94, -0.87, 0.15)
-		this.position(this.duelist2, -0.88, -0.87, 0.15)
-		
-		//this.scholar.y = 100
-		
-		this.awakeningContainer.scale.set(0.75)
-		this.position(this.mage, -0.5, 0, 0.95)
-		this.position(this.duelist, 0.5, 0, 0.9)
-		
-		this.awakening1.y = 100
-		this.awakening2.y = this.awakening1.y
-		this.awakening1.scale.set(0.75)
-		this.awakening2.scale.set(0.75)
+	layout(screenWidth, screenHeight, centerX, centerY, isHorizontalDisplay) {
+		for (const awakening of [this.awakening1, this.awakening2]) {
+			awakening.y = 100
+			
+			this.controller.arrangeUi({
+				align: 'center',
+				y: awakening.y,
+				spacing: isHorizontalDisplay ? 50 : 50,
+				scale: isHorizontalDisplay ? 0.6 : 0.6,
+				elements: [
+					[this.mage, 0.95],
+					[awakening, 1],
+					[this.duelist, 0.9]
+				]
+			})
+		}
 	}
 	
 	update(time, dt) {

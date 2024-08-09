@@ -8,25 +8,16 @@ export class HomePage extends Page {
 	settings = {
 		title: 'title',
 		slogan: 'slogan',
-		textures: ['f', 'scholar', 'pieceQuest'],
+		textures: ['f', 'pieceQuest'],
 		tmSlogan: true,
 		julia: {
 			maxIterations: 10,
 			getReal: (time) => 0
-		}
-	}
-	
-	cheeseRotationDirection = 1
-	cheeseAccel = 0
-	
-	init() {
-		this.scholar2 = this.newSprite('scholar')
-		
-		this.cheeseContainer = this.newContainer(this.frameContainer)
-		this.cheese = this.newSprite('cheese', this.cheeseContainer)
-		this.func = this.newSprite('f', this.cheeseContainer)
-		
-		this.addNewStory(
+		},
+		ui: [
+			{texture: 'scholar', page: 'pieceQuest'}
+		],
+		story: [
 			'Code on Bleu was founded\nwith one quest in mind...',
 			'To create the games\nwe always wanted to play.',
 			'We aspire to create\ngames which...',
@@ -41,21 +32,30 @@ export class HomePage extends Page {
 			'and discover endless\nreplayability!',
 			'Starting with the\nPiece Quest Saga...',
 			'an epic adventure is\nabout to unfold!'
-		)
+		]
+	}
+	
+	cheeseRotationDirection = 1
+	cheeseAccel = 0
+	
+	init() {
+		this.cheeseContainer = this.newContainer(this.frameContainer)
+		this.cheese = this.newSprite('cheese', this.cheeseContainer)
+		this.func = this.newSprite('f', this.cheeseContainer)
+		
+		this.addStory()
 		
 		this.pieceQuestContainer = this.newContainer(this.frameContainer)
 		this.scholar = this.newSprite('scholar', this.pieceQuestContainer)
 		this.pieceQuest1 = this.newSprite('pieceQuest', this.pieceQuestContainer)
 		this.pieceQuest2 = this.newSprite('pieceQuest', this.pieceQuestContainer)
 		
-		this.setFilters(this.scholar2, 'glow', 'dropShadow')
 		this.setFilters(this.cheese, 'dropShadow')
 		this.setFilters(this.func, 'bloom', 'dropShadow')
 		this.setFilters(this.scholar, 'glow', 'dropShadow')
 		this.setFilters(this.pieceQuest1, 'glow', 'dropShadow')
 		this.setFilters(this.pieceQuest2, 'bloom', 'glow', 'asciiSmall')
 	
-		this.onClick(this.scholar2, () => this.loadPage('pieceQuest'))
 		this.onClick(this.pieceQuestContainer, () => this.loadPage('pieceQuest'))
 		
 		this.onClick(this.cheeseContainer, () => {
@@ -67,8 +67,7 @@ export class HomePage extends Page {
 		})
 	}
 	
-	layout() {
-		this.position(this.scholar2, -0.94, -0.87, 0.2)
+	layout(screenWidth, screenHeight, centerX, centerY, isHorizontalDisplay) {
 		this.func.position.set(-140, 30)
 	}
 	
