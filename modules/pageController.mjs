@@ -193,9 +193,9 @@ export class PageController {
 		
 		this.onClick(this.#expand, toggleFullscreen)
 		this.onClick(this.#unexpand, toggleFullscreen)
-		this.onClick(this.#facebook, () => this.open('https://www.facebook.com/profile.php?id=61561860844447'))
-		this.onClick(this.#youtube, () => this.open('https://www.youtube.com/@CodeOnBleu'))
-		this.onClick(this.#linkedin, () => this.open('https://www.linkedin.com/company/code-on-bleu'))
+		this.onClick(this.#facebook, () => openInNewTab('https://www.facebook.com/profile.php?id=61561860844447'))
+		this.onClick(this.#youtube, () => openInNewTab('https://www.youtube.com/@CodeOnBleu'))
+		this.onClick(this.#linkedin, () => openInNewTab('https://www.linkedin.com/company/code-on-bleu'))
 		
 		// disable all interaction underneath rectangle4
 		this.#rectangle4.eventMode = 'static'
