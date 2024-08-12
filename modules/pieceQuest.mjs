@@ -75,7 +75,7 @@ export class PieceQuestPage extends Page {
 				align: 'center',
 				y: awakening.y,
 				spacing: isHorizontalDisplay ? 50 : 50,
-				scale: isHorizontalDisplay ? 0.5 : 0.45,
+				scale: isHorizontalDisplay ? 0.55 : 0.45,
 				elements: [
 					[this.mage, 0.95],
 					[awakening, 1],
