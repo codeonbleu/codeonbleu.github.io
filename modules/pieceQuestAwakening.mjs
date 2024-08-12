@@ -20,15 +20,16 @@ export class PieceQuestAwakeningPage extends Page {
 			{texture: 'scholar', page: 'pieceQuest'}
 		],
 		story: [
-			'In a world where\ngame pieces come to life...',
-			'one must rise to the challenge\nof an imminent threat...',
-			'Embark on an epic adventure\nto save the world!',
+			'In a world where\ngame pieces come\nto life...',
+			'one must rise\nto the challenge\nof an imminent threat.',
+			'Embark on an epic\nadventure to\nsave the world!',
 			'Engage in highly\nstrategic gameplay...',
-			'relying on your wits\nand creativity for survival.',
-			'With abundant character classes\nand unique encounters...',
+			'relying on your wits\nand creativity\nfor survival.',
+			'With abundant\ncharacter classes',
+			'and unique\nencounters...',
 			'no two games\nare ever the same.',
 			'Coming soon!',
-			'Genre: RPG, Tactical,\nRougelike, Deckbuilding'
+			'Genre: RPG,\nTactical,\nRougelike,\nDeckbuilding'
 		]
 	}
 	

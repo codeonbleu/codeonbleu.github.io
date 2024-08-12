@@ -121,7 +121,7 @@ export class PageController {
 		loading.scale.set(this.#scale)
 		app.ticker.add((time) => loading.rotation += time.deltaTime * 0.1)
 		
-		await this.loadTextures('expand', 'unexpand', 'facebook', 'linkedin', 'youtube', 'cheese', 'TM')
+		await this.loadTextures('expand', 'unexpand', 'facebook', 'linkedin', 'youtube', 'cheese', 'TM', 'arrow')
 	}
 	
 	#createBaseGraphics() {

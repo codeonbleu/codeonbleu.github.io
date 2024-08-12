@@ -143,6 +143,8 @@ export class Page {
 		
 		this.slogan1 = this.newSprite(settings.slogan)
 		this.slogan2 = this.newSprite(settings.slogan, null, controller.overlayAlpha)
+		this.leftArrow = this.newSprite('arrow')
+		this.rightArrow = this.newSprite('arrow')
 		
 		if (settings.tmSlogan) {
 			this.tmSlogan = this.newSprite('TM', null, 0.125)
@@ -158,6 +160,8 @@ export class Page {
 		this.setFilters(this.title2, 'bloom', 'glow', 'asciiSmall')
 		this.setFilters(this.slogan1, 'glow', 'dropShadow')
 		this.setFilters(this.slogan2, 'bloom', 'asciiSmall')
+		this.setFilters(this.leftArrow, 'glow', 'dropShadow')
+		this.setFilters(this.rightArrow, 'glow', 'dropShadow')
 		
 		if (settings.story != null) {
 			await this.#createStory()
@@ -166,14 +170,18 @@ export class Page {
 		this.onClick(this.title2, () => {
 			controller.getDynamicColor(0).update(1)
 			this.#controller.titleAccel = 8
-			this.#nextFrame()
+			this.#nextFrame(1)
 		})
 		
-		this.onClick(this.slogan2, () => {
+		const nextFrame = (offset) => {
 			controller.getDynamicColor(2).update(1)
 			this.#controller.sloganAccel = 8
-			this.#nextFrame()
-		})
+			this.#nextFrame(offset)
+		}
+		
+		this.onClick(this.slogan2, () => nextFrame(1))
+		this.onClick(this.leftArrow, () => nextFrame(-1))
+		this.onClick(this.rightArrow, () => nextFrame(1))
 		
 		this.init()
 		this.#resetFrames()
@@ -207,6 +215,16 @@ export class Page {
 		
 		this.position(this.slogan1, 0, phi, 0.75)
 		this.position(this.slogan2, 0, phi, 0.75)
+		
+		if (isHorizontalDisplay) {
+			this.position(this.rightArrow, phi, 0, 0.5)
+			this.position(this.leftArrow, -phi, 0, 0.5)
+		} else {
+			this.position(this.rightArrow, phi2, 0,  0.75)
+			this.position(this.leftArrow, -phi2, 0, 0.75)
+		}
+		
+		this.leftArrow.scale.x *= -1
 		
 		if (this.tmSlogan) {
 			this.tmSlogan.position.set(this.slogan1.x + this.slogan1.width / 2 + 80, this.slogan1.y - this.slogan1.height * 0.4)
@@ -250,7 +268,7 @@ export class Page {
 		})
 	}
 	
-	#nextFrame() {
+	#nextFrame(offset) {
 		const data = this.#frameData
 		const numFrames = this.frameContainer.children.length
 		
@@ -260,7 +278,11 @@ export class Page {
 		
 		data.animating = true
 		data.elapsed = 0
-		data.nextIndex = (data.index + 1) % numFrames
+		data.nextIndex = (data.index + offset) % numFrames
+		
+		if (data.nextIndex < 0) {
+			data.nextIndex += numFrames
+		}
 	}
 	
 	#updateFrame(dt) {

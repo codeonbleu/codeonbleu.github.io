@@ -21,16 +21,16 @@ export class PieceQuestPage extends Page {
 		story: [
 			'Enter a universe...',
 			'where game pieces\ncome to life!',
-			'Experience deep gameplay...',
+			'Experience deep\ngameplay',
 			'in several iterations\nand formats.',
 			'Welcome to the\nPiece Quest Saga!',
 			'Whether you enjoy\nJRPGs, TRPGs...',
 			'SRPGs, CRPGs,\nARPGS, RTSs...',
-			'Rougelikes, Sidescrollers,\nDeckbuilders, Auto-battlers...',
+			'Rougelikes,\nSidescrollers,\nDeckbuilders,\nAuto-battlers...',
 			'or other intriguing\ngame formats...',
-			'there will be a\nPiece Quest for you!',
-			'Beginning with\nPiece Quest: Awakening...',
-			'Join now as the\nadventure unfolds!'
+			'there will be a\nPiece Quest for\nyou!',
+			'Beginning with\nPiece Quest:\nAwakening',
+			'Follow now as the\nadventure unfolds!'
 		]
 	}
 	
@@ -64,14 +64,18 @@ export class PieceQuestPage extends Page {
 	}
 	
 	layout(screenWidth, screenHeight, centerX, centerY, isHorizontalDisplay) {
+		if (isHorizontalDisplay) {
+			this.scholar.position.set(0, 40)
+		}
+		
 		for (const awakening of [this.awakening1, this.awakening2]) {
-			awakening.y = 100
+			awakening.y = isHorizontalDisplay ? 40 : 0
 			
 			this.controller.arrangeUi({
 				align: 'center',
 				y: awakening.y,
 				spacing: isHorizontalDisplay ? 50 : 50,
-				scale: isHorizontalDisplay ? 0.6 : 0.6,
+				scale: isHorizontalDisplay ? 0.5 : 0.45,
 				elements: [
 					[this.mage, 0.95],
 					[awakening, 1],

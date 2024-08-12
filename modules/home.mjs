@@ -18,8 +18,9 @@ export class HomePage extends Page {
 			{texture: 'scholar', page: 'pieceQuest'}
 		],
 		story: [
-			'Code on Bleu was founded\nwith one quest in mind...',
-			'To create the games\nwe always wanted to play.',
+			'Code on Bleu\nwas founded...',
+			'with one quest\nin mind...',
+			'To create the games\nwe always wanted\nto play.',
 			'We aspire to create\ngames which...',
 			'evoke a sense of wonder\nand adventure...',
 			'contain mystery\nand secrets galore...',
@@ -31,7 +32,7 @@ export class HomePage extends Page {
 			'players shall conquer\nimpossible feats...',
 			'and discover endless\nreplayability!',
 			'Starting with the\nPiece Quest Saga...',
-			'an epic adventure is\nabout to unfold!'
+			'follow now as the\nadventure unfolds!'
 		]
 	}
 	
@@ -68,13 +69,25 @@ export class HomePage extends Page {
 	}
 	
 	layout(screenWidth, screenHeight, centerX, centerY, isHorizontalDisplay) {
-		this.func.position.set(-140, 30)
+		if (isHorizontalDisplay) {
+			this.func.position.set(-70, 50)
+			this.cheese.position.set(70, 20)
+		} else {
+			this.func.position.set(-70, 0)
+			this.cheese.position.set(70, -30)
+		}
+		
 		this.title1.scale.set(0.85)
 		this.title2.scale.set(0.85)
 		this.slogan1.scale.set(isHorizontalDisplay ? 0.85 : 1)
 		this.slogan2.scale.set(isHorizontalDisplay ? 0.85 : 1)
 		this.tmSlogan.position.set(this.slogan1.x + this.slogan1.width / 2 + 80, this.slogan1.y - this.slogan1.height * 0.4)
-		this.pieceQuestContainer.scale.set(isHorizontalDisplay ? 0.85 : 1)
+		
+		this.pieceQuestContainer.scale.set(0.8)
+		
+		if (isHorizontalDisplay) {
+			this.pieceQuestContainer.y = 40
+		}
 	}
 	
 	update(time, dt) {
