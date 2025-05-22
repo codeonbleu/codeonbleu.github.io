@@ -131,6 +131,7 @@ export class Page {
 			const sprite = this.newSprite(textureKey)
 			this.setFilters(sprite, 'glow', 'dropShadow')
 			this.onClick(sprite, () => this.loadPage(page))
+			this.controller.setUiVisibility(sprite)
 			this.#ui.push(sprite)
 		}
 		
@@ -145,6 +146,9 @@ export class Page {
 		this.slogan2 = this.newSprite(settings.slogan, null, controller.overlayAlpha)
 		this.leftArrow = this.newSprite('arrow')
 		this.rightArrow = this.newSprite('arrow')
+		
+		this.controller.setUiVisibility(this.leftArrow)
+		this.controller.setUiVisibility(this.rightArrow)
 		
 		if (settings.tmSlogan) {
 			this.tmSlogan = this.newSprite('TM', null, 0.125)

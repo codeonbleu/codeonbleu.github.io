@@ -68,8 +68,8 @@ export class PageController {
 	
 	async init(pageKey) {
 		assignIf(this.#settings, {
-			pauseEnabled: false,
-			hideUi: false
+			pauseEnabled: true,
+			hideUi: true
 		})
 		
 		await this.#loadResources()
@@ -262,7 +262,7 @@ export class PageController {
 			this.#setPage(page)
 		}
 		
-		this.#controllerUiContainer.visible = true
+		this.setUiVisibility(this.#controllerUiContainer)
 		window.history.replaceState('', '', '?key=' + key)
 	}
 	
@@ -395,6 +395,10 @@ export class PageController {
 		displayObject.scale.set(scale == null ? 1 : scale)
 		
 		return displayObject
+	}
+	
+	setUiVisibility(displayObject) {
+		displayObject.visible = !this.#settings.hideUi
 	}
 	
 	#recalculateScale() {
