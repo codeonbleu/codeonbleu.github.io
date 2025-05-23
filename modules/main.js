@@ -155,8 +155,8 @@ async function init() {
 		timeText.scale = iconScale * 3.2
 		
 		;[expand, unexpand].forEach(expander => {
-			expander.position.set(screenWidth - iconTextLeft - 100 * scale, 0.975 * screenHeight)
 			expander.scale = isMobile ? scale / 5 : scale / 10
+			expander.position.set(screenWidth - iconTextLeft - 1000 * expander.scale.x, 0.975 * screenHeight)
 		})
 		
 		youtube.position.set(screenWidth / 2, 0.975 * screenHeight)
@@ -193,7 +193,7 @@ async function init() {
 		backgroundRectangle.clear()
 		backgroundRectangle.rect(0, 0, screenWidth, screenHeight).fill(backgroundGradient)
 		
-		timeText.text = '' + now.getHours() + ':' + now.getMinutes()
+		timeText.text = '' + now.getHours() + (now.getHours() < 10 ? ' ' : '') + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes()
 		
 		expand.visible = !isFullscreen
 		unexpand.visible = isFullscreen
