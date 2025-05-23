@@ -2,8 +2,8 @@
 
 'use strict'
 
-import {Filter, GlProgram} from './../pixi.min.mjs'
-import {vertex} from './defaultVertex.mjs'
+import {Filter, GlProgram} from './../pixi.min.js'
+import {vertex} from './defaultVertex.js'
 
 export class JuliaFilter extends Filter {
 	constructor(args) {
