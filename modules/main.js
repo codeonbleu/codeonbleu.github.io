@@ -34,6 +34,7 @@ async function init() {
 	}
 	
 	const add = (child) => app.stage.addChild(child)
+	const newGraphics = () => add(new Graphics())
 	
 	const newSprite = (key, filters) => {
 		const result = new Sprite(textures[key])
@@ -53,37 +54,27 @@ async function init() {
 		return add(result)
 	}
 	
-	const newGraphics = () => {
-		const result = new Graphics()
-		return add(result)
-	}
-	
 	const onClick = (displayObject, callback) => {
 		displayObject.eventMode = 'static'
 		displayObject.cursor = 'pointer'
 		displayObject.on('pointerdown', callback)
 	}
 	
+	const newFilter = (construct, args, mobileResolution) => {
+		const result = new construct(args)
+		result.resolution = mobileResolution != null && isMobile ? mobileResolution : window.devicePixelRatio
+		return result
+	}
+	
 	await loadTextures('codeOnBleu', 'face', 'delicious', 'github',
 		'youtube', 'linkedin', 'expand', 'unexpand')
 	
-	const glow1 = new GlowFilter()
-	glow1.resolution = window.devicePixelRatio
-	
-	const glow2 = new GlowFilter()
-	glow2.resolution = window.devicePixelRatio
-	
-	const ascii1 = new AsciiFilter({size: isMobile ? 8 : 8, replaceColor: true})
-	ascii1.resolution = window.devicePixelRatio
-	
-	const dot1 = new DotFilter({grayscale: false, scale: 0.1})
-	dot1.resolution = isMobile ? 1 : window.devicePixelRatio
-	
-	const julia1 = new JuliaFilter({maxIterations: isMobile ? 5 : 10})
-	julia1.resolution = isMobile ? 1 : window.devicePixelRatio
-	
-	const julia2 = new JuliaFilter({maxIterations: isMobile ? 5 : 10})
-	julia2.resolution = isMobile ? 1 : window.devicePixelRatio
+	const glow1 = newFilter(GlowFilter, {})
+	const glow2 = newFilter(GlowFilter, {})
+	const ascii1 = newFilter(AsciiFilter, {size: isMobile ? 8 : 8, replaceColor: true})
+	const dot1 = newFilter(DotFilter, {grayscale: false, scale: 0.1}, 1)
+	const julia1 = newFilter(JuliaFilter, {maxIterations: isMobile ? 5 : 5}, 1)
+	const julia2 = newFilter(JuliaFilter, {maxIterations: isMobile ? 5 : 5}, 1)
 	
 	const rect1 = newGraphics()
 	const rect2 = newGraphics()
@@ -104,6 +95,9 @@ async function init() {
 	rect1.filters = [julia1, dot1]
 	rect2.filters = [julia2, dot1]
 	
+	let colorAccel = 0
+	
+	onClick(face, () => colorAccel = 6)
 	onClick(delicious, () => openInNewTab('https://github.com/codeonbleu/Delicious'))
 	onClick(deliciousText, () => openInNewTab('https://github.com/codeonbleu/Delicious'))
 	onClick(github, () => openInNewTab('https://github.com/codeonbleu'))
@@ -208,24 +202,27 @@ async function init() {
 		tasksGradient.addColorStop(1, 0x112266)
 		tasks.clear().rect(0, 0.95 * screenHeight, screenWidth, screenHeight).fill(tasksGradient)
 		
-		timeText.anchor.x = 1
+		const taskHeight = 0.05 * screenHeight
+		const iconHeight = taskHeight * 0.7
+		
 		timeText.anchor.y = 0.5
-		timeText.position.set(screenWidth - 20 * scale, tasksMidY)
-		timeText.scale = isMobile ? 1.6 * scale : 16 * scale / 15
+		timeText.scale = 1
+		timeText.scale = taskHeight * 0.5 / timeText.height
+		timeText.position.set(screenWidth - (isMobile ? 80 : 85) * timeText.scale.x, tasksMidY)
 		
 		for (const expander of [expand, unexpand]) {
-			expander.scale = isMobile ? scale / 5 : scale / 10
+			expander.scale = taskHeight * 0.5 / expander.texture.height
 			expander.anchor.x = 1
-			expander.position.set(screenWidth - 100 * timeText.scale.x, tasksMidY)
+			expander.position.set(screenWidth - timeText.scale.x * 100, tasksMidY)
 		}
 		
-		github.scale = isMobile ? scale / 3.5 : scale / 7
+		github.scale = iconHeight / github.texture.height
 		github.position.set(screenWidth / 2 - 400 * github.scale.x, tasksMidY)
 		
+		youtube.scale = iconHeight / youtube.texture.height
 		youtube.position.set(screenWidth / 2, tasksMidY)
-		youtube.scale = isMobile ? scale / 2 : scale / 4
 		
-		linkedin.scale = isMobile ? scale / 1.8 : scale / 3.6
+		linkedin.scale = iconHeight / linkedin.texture.height
 		linkedin.position.set(screenWidth / 2 + 200 * linkedin.scale.x, tasksMidY)
     }
 
@@ -234,7 +231,6 @@ async function init() {
 	
 	let totalTime = 0
 	let juliaTime = 0
-	let juliaAccel = 0
 	
 	app.ticker.add((time) => {
 		const dt = time.deltaTime
@@ -242,11 +238,11 @@ async function init() {
 		const screenHeight = app.screen.height
 		const isFullscreen = document.fullscreen
 		const now = new Date()
+		const colorMul = 1 + colorAccel
 		
 		totalTime += dt
-		
-		juliaTime += 0.04 * dt
-		juliaAccel *= 0.99 - 0.001 * dt
+		colorAccel *= 0.99 - 0.001 * dt
+		juliaTime += 0.04 * dt * colorMul
 		
 		dot1.angle = (juliaTime / -20) % tau
 		
@@ -259,9 +255,9 @@ async function init() {
 		julia2.realC = Math.sin(juliaTime2 * 0.2)
 		julia2.imagC = Math.cos(juliaTime2 * 1.3 * 0.2)
 		
-		dc1.update(dt / 100)
-		dc2.update(dt / 100)
-		dc3.update(dt / 200)
+		dc1.update(colorMul * dt / 100)
+		dc2.update(colorMul * dt / 100)
+		dc3.update(colorMul * dt / 200)
 		
 		glow1.color = dc1.getInt()
 		glow2.color = dc2.getInt()
